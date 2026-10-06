@@ -99,7 +99,7 @@ def run_task(task_id: str, condition: str, results_dir="results", model=None, re
                 config={"callbacks": [usage], "recursion_limit": recursion_limit},
             )
             messages = result["messages"]
-            final = messages[-1].content if messages else ""
+            final = (messages[-1].text if isinstance(getattr(messages[-1], "text", None), str) else messages[-1].content) if messages else ""
         except Exception as exc:  # noqa: BLE001
             record["error"] = f"{type(exc).__name__}: {exc}"
             messages, final = [], ""

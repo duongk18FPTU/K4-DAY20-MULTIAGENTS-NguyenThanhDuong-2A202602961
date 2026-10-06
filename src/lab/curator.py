@@ -114,7 +114,9 @@ def curate_skills(results_dir="results", source_condition="baseline", out_dir=No
         blocks.append(f"## Run: {r['task']}\nFailed checks:\n{checks}\nEnd of trace:\n{r['trace']}")
     prompt = CURATOR_PROMPT.format(max_skills=max_skills, runs="\n\n".join(blocks))
 
-    reply = (model or make_model()).invoke(prompt).content
+    response = (model or make_model()).invoke(prompt)
+    # some providers (for example Gemini) return the content as a list of parts; .text joins the text parts
+    reply = response.text if isinstance(getattr(response, "text", None), str) else response.content
     written = []
     for name, text in parse_skill_blocks(reply):
         if len(written) >= max_skills:
